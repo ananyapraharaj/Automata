@@ -1,11 +1,11 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import csv
 import pandas as pd
 import io 
-import pycaret.regression as pr
+# import pycaret.regression as pr
 import os
-import pycaret.classification as pc
+# import pycaret.classification as pc
 import pickle
 import sklearn
 from sklearn.base import is_classifier, is_regressor
@@ -13,8 +13,13 @@ import tempfile
 from fastapi import FastAPI
 import uvicorn
 from pydantic import BaseModel
+from django.middleware.csrf import get_token
 
 app=FastAPI()
+
+def get_csrf_token(request):
+    csrf_token=get_token(request)
+    return JsonResponse({'csrfToken':csrf_token})
 
 def remove_percent_symbol(entry):
     if isinstance(entry, str) and '%' in entry:
@@ -94,4 +99,4 @@ def process_parameter_form(request):
             'session_value': session_value,
         }
         request.session['params'] = parameter_data
-        return render(request,'gateway.html',context)
+        return HttpResponse(parameter_data)
